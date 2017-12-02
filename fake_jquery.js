@@ -1,6 +1,4 @@
 {
-
-
     var $ = (params) => {
         params = params.split(",").map(String);
         arr = [];
@@ -8,11 +6,9 @@
             Array.prototype.forEach.call(params, function (el) {
                 var element = document.querySelectorAll(el);
                 Array.prototype.forEach.call(element, function (el) {
-
                     return arr.push(el);
                 })
             });
-
             return this;
         }
         this.run()
@@ -21,9 +17,8 @@
         }
         this.on = function (event, callback, fn = false) {
             this.call(arr, function (el) {
-                 el.addEventListener(event, callback, fn);
+                el.addEventListener(event, callback, fn);
             });
-
             return this;
         }
         this.html = (text = null) => {
@@ -46,15 +41,15 @@
             });
             return this;
         }
-        this.attr = (data,value) => {
-             this.call(arr, function (el) {
-                 console.log(el);
-                  if(data && value) {
-                    el.setAttribute(data,value);
-                }else{
-                      el.getAttribute(data);
+        this.attr = (data, value) => {
+            this.call(arr, function (el) {
+                console.log(el);
+                if (data && value) {
+                    el.setAttribute(data, value);
+                } else {
+                    el.getAttribute(data);
                 }
-             });
+            });
             return this;
         }
 
@@ -62,9 +57,9 @@
             this.call(arr, function (el) {
                 console.log(el);
                 if (data && value) {
-                    el.setAttribute("data-"+data, value);
+                    el.setAttribute("data-" + data, value);
                 } else {
-                    el.getAttribute("data-" +data);
+                    el.getAttribute("data-" + data);
                 }
             });
             return this;
@@ -108,7 +103,6 @@
                     }
                 }, delay / 7);
             });
-
             return this;
         };
         this.fadein = function (delay) {
@@ -132,55 +126,53 @@
 
         this.setup = function (delay) {
             this.call(arr, function (el) {
-            var hg = el.offsetHeight;
-            return el.style.cssText =
-                "box-sizing:border-box;display:block;overflow:hidden; transition: transform 0.4s cubic-bezier(0, 1, 0.5, 1);";
-        });
-        return this;
+                var hg = el.offsetHeight;
+                return el.style.cssText = "box-sizing:border-box;display:block;overflow:hidden; transition: transform 0.4s cubic-bezier(0, 1, 0.5, 1);";
+            });
+            return this;
 
         };
         this.slideup = function (delay) {
             this.call(arr, function (el) {
-                    if (!delay) {
-                        delay = 400;
+                if (!delay) {
+                    delay = 400;
+                }
+                this.setup(delay, el);
+                var padT = Number(window.getComputedStyle(el).paddingBottom.replace("px", ""));
+                var padB = Number(window.getComputedStyle(el).paddingTop.replace("px", ""));
+                var pad = padT + padB;
+                var hg = el.offsetHeight - pad;
+                var s = el.style;
+                el.setAttribute("data-slide", "up");
+                var effect = setInterval(function () {
+                    hg -= parseFloat(hg / delay) * 3;
+                    s.height = hg + "px";
+                    if (hg < 50) {
+                        hg -= parseFloat(hg / delay) * 5;
                     }
-                    this.setup(delay, el);
-                    var padT = Number(window.getComputedStyle(el).paddingBottom.replace("px", ""));
-                    var padB = Number(window.getComputedStyle(el).paddingTop.replace("px", ""));
-                    var pad = padT + padB;
-                    var hg = el.offsetHeight - pad;
-                    var s = el.style;
-                    el.setAttribute("data-slide", "up");
-                    var effect = setInterval(function () {
-                        hg -= parseFloat(hg / delay) * 3;
-                        s.height = hg + "px";
-                        if (hg < 50) {
-                            hg -= parseFloat(hg / delay) * 5;
-                        }
-                        if (hg <= pad) {
-                            s.paddingTop = 0;
-                            s.paddingBottom = 0;
-                            s.color = "transparent";
-                        }
-                        if (hg < 2) {
-                            s.height = 0;
-                            window.clearInterval(effect);
+                    if (hg <= pad) {
+                        s.paddingTop = 0;
+                        s.paddingBottom = 0;
+                        s.color = "transparent";
+                    }
+                    if (hg < 2) {
+                        s.height = 0;
+                        window.clearInterval(effect);
+                        setTimeout(function () {
+                            s.borderWidth = "0";
                             setTimeout(function () {
-                                s.borderWidth = "0";
-                                setTimeout(function () {
-                                    s.cssText = "";
-                                    s.display = "none";
-                                }, 1)
+                                s.cssText = "";
+                                s.display = "none";
                             }, 1)
-                        }
-                    }, "fast");
-                });
-           return this;
-                
-            };
-            this.slidedown = function (delay) {
-                this.call(arr, function (el) {
-                   if (!delay) {
+                        }, 1)
+                    }
+                }, "fast");
+            });
+            return this;
+        };
+        this.slidedown = function (delay) {
+            this.call(arr, function (el) {
+                if (!delay) {
                     delay = 400;
                 }
                 this.effect = false;
@@ -196,7 +188,6 @@
                 s.paddingBottom = 0;
                 s.color = "transparent";
                 el.setAttribute("data-slide", "down");
-
                 var effect = setInterval(function () {
                     h += parseFloat(hg / delay) * 2;
                     s.height = h + "px";
@@ -214,35 +205,28 @@
                     }
                 }, "fast")
             });
-                return this;
-
-            };
-            this.slidetoggle = function (delay) {
-                this.call(arr, function (el) {
-                 this.setup(delay, el);
+            return this;
+        };
+        this.slidetoggle = function (delay) {
+            this.call(arr, function (el) {
+                this.setup(delay, el);
                 if (el.getAttribute("data-slide") == "up" || el.hasAttribute("data-slide") == false) {
                     this.slidedown(delay);
                 } else if (el.getAttribute("data-slide") == "down") {
                     this.slideup(delay);
                 }
             });
-                return this;
-            };
-
-            this.fadetoggle = function (delay) {
-                if (window.getComputedStyle(el).opacity > 0) {
-                    this.fadeout(delay);
-                } else {
-                    this.fadein(delay);
-                };
-
-                return this;
-            };
-
             return this;
-
-        }
-
-
+        };
+        this.fadetoggle = function (delay) {
+            if (window.getComputedStyle(el).opacity > 0) {
+                this.fadeout(delay);
+            } else {
+                this.fadein(delay);
+            };
+            return this;
+        };
+        return this;
 
     }
+}
