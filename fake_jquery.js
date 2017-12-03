@@ -1,23 +1,44 @@
 {
     var $ = (params) => {
-        params = params.split(",").map(String);
-        arr = [];
+        let selectType;
+        if (typeof params === "string") {
+            params = params.split(",").map(String);
+            selectType = "str";
+            arr = [];
+        } else {
+            arr = [params];
+            selectType = "object";
+        }
         this.run = () => {
-            Array.prototype.forEach.call(params, function (el) {
-                var element = document.querySelectorAll(el);
-                Array.prototype.forEach.call(element, function (el) {
-                    return arr.push(el);
-                })
-            });
+            if (selectType === "str") {
+                Array.prototype.forEach.call(params, function (el) {
+                    var element = document.querySelectorAll(el);
+                    Array.prototype.forEach.call(element, function (el) {
+                        return arr.push(el);
+                    })
+                });
+            }
             return this;
         }
-        this.run()
+        this.run();
         this.call = (el, callback) => {
-            Array.prototype.forEach.call(el, callback);
+            if (selectType === "str") {
+                Array.prototype.forEach.call(el, callback);
+            } else {
+                 
+                Array.prototype.forEach.call(el, callback);
+            }
+            return this;
         }
         this.on = function (event, callback, fn = false) {
             this.call(arr, function (el) {
                 el.addEventListener(event, callback, fn);
+            });
+            return this;
+        }
+        this.off = function (event, callback, fn = false) {
+            this.call(arr, function (el) {
+                el.removeEventListener(event, callback, fn);
             });
             return this;
         }
@@ -43,7 +64,6 @@
         }
         this.attr = (data, value) => {
             this.call(arr, function (el) {
-                console.log(el);
                 if (data && value) {
                     el.setAttribute(data, value);
                 } else {
@@ -53,9 +73,20 @@
             return this;
         }
 
+        this.hasattr = (data) => {
+            this.call(arr, function (el) {
+                el.hasAttribute(data);
+            });
+            return this;
+        }
+        this.removeattr = (data) => {
+            this.call(arr, function (el) {
+                el.removeAttribute(data);
+            });
+            return this;
+        }
         this.data = (data, value) => {
             this.call(arr, function (el) {
-                console.log(el);
                 if (data && value) {
                     el.setAttribute("data-" + data, value);
                 } else {
@@ -64,8 +95,225 @@
             });
             return this;
         }
-        this.hide = () => {
+        this.hasdata = (data) => {
             this.call(arr, function (el) {
+                el.hasAttribute("data-" + data);
+            });
+            return this;
+        }
+        this.removedata = (data) => {
+            this.call(arr, function (el) {
+                el.removeAttribute("data-" + data);
+            });
+            return this;
+        }
+        this.index = () => {
+            let index;
+            this.call(arr, function (el) {
+                let i = el.parentNode.children.length;
+
+                for (let w = 0; w < i; w++) {
+                    el.parentNode.children[0].setAttribute("tabindex", w);
+                }
+                index = el.getAttribute("tabindex");
+            });
+            return index;
+        }
+        this.clone = () => {
+            let clones;
+            this.call(arr, function (el) {
+                clones = el.cloneNode(true);
+            });
+            return clones || this;
+        }
+        this.parent = function () {
+            this.call(arr, function (el) {
+                el.parentNode;
+            });
+            return this;
+        }
+        this.closest = (par) => {
+            this.call(arr, function (el) {
+                el.closest(par);
+            });
+            return this;
+
+        }
+        this.siblings = (selector) => {
+            let item = [];
+            this.call(arr, function (el) {
+                item = el.parentNode.querySelectorAll(selector);
+                arr=[];
+                this.call(item, function (wr) {
+                    arr.push(wr);
+                });
+                 return item || this;
+             });
+            return this;
+        } 
+        this.append = (tag, item) => {
+            this.call(arr, function (el) {
+                var tager = document.createElement(tag);
+                tager.innerHTML = item;
+                el.append(tager);
+            });
+            return this;
+        }
+        this.appendto = (tag) => {
+            let to = document.querySelector(tag);
+            this.call(arr, function (el) {
+                to.append(el);
+            });
+            return this;
+        }
+        this.prependto = (tag) => {
+            let to = document.querySelector(tag);
+            this.call(arr, function (el) {
+                to.prepend(el);
+            });
+            return this;
+        }
+        this.find = (find_item) => {
+            this.call(arr, function (el) {
+                let item = el.querySelectorAll(find_item);
+                this.call(item, function (finds) {
+                    return finds;
+                });
+            });
+            return this;
+        }
+        this.prepend = (tag, item) => {
+            this.call(arr, function (el) {
+                var tager = document.createElement(tag);
+                tager.innerHTML = item;
+                el.prepend(tager);
+            });
+            return this;
+        }
+        this.remove = (item) => {
+            this.call(arr, function (el) {
+                el.remove();
+            });
+            return this;
+        }
+        this.width = (par = null) => {
+            this.call(arr, function (el) {
+                if (par === null) {
+                    el.offsetWidth;
+                } else {
+                    el.style.width = par;
+                }
+            });
+            return this;
+        }
+        this.height = (par = null) => {
+            this.call(arr, function (el) {
+                if (par === null) {
+                    el.offsetHeight;
+                } else {
+                    el.style.height = par;
+                }
+            });
+            return this;
+        }
+        this.css = (par) => {
+            this.call(arr, function (el) {
+                el.style.cssText = par;
+            });
+            return this;
+        }
+        this.style = (par) => {
+            let result;
+            this.call(arr, function (el) {
+                result = window.getComputedStyle(el)[par];
+            });
+            return result;
+        }
+        this.offset = (par) => {
+            let result;
+            this.call(arr, function (el) {
+                result = el.offset;
+            });
+            return result;
+        }
+        this.children = (par) => {
+            this.call(arr, function (el) {
+                el.children;
+            });
+            return this;
+        }
+        this.prev = () => {
+            this.call(arr, function (el) {
+                el.previousSibling;
+            });
+            return this;
+        }
+        this.next = () => {
+            let sibling;
+            this.call(arr, function (el) {
+                el.nextElementSibling;
+            });
+            return this;
+        }
+        this.addclass = (className) => {
+            let classes = className.split(" ").map(String);
+            this.call(arr, function (el) {
+                let cl = el.classList;
+                for (dot of classes) {
+                    if (cl.contains(dot)) {
+                        console.error("Vermek istediğiniz " + dot + " class'ı mevcut");
+                    } else {
+                        el.classList.add(dot);
+                    }
+                }
+            });
+            return this;
+        }
+        this.removeclass = (className) => {
+            let classes = className.split(" ").map(String);
+            this.call(arr, function (el) {
+                let cl = el.classList;
+                for (dot of classes) {
+                    if (!cl.contains(dot)) {
+                        console.error("Silmek istediğiniz " + dot + " class'ı mevcut değil");
+                    } else {
+                        el.classList.remove(dot);
+                    }
+                }
+            });
+            return this;
+        }
+        this.toggleclass = (className) => {
+            let classes = className.split(" ").map(String);
+            this.call(arr, function (el) {
+                let cl = el.classList;
+                for (dot of classes) {
+                    if (!cl.contains(dot)) {
+                        el.classList.add(dot);
+                    } else {
+                        el.classList.remove(dot);
+                    }
+                }
+            });
+            return this;
+        }
+        this.hasclass = (className) => {
+            let classes = className.split(" ").map(String),
+                contain;
+            this.call(arr, function (el) {
+                let cl = el.classList;
+                for (dot of classes) {
+                    contain = cl.contains(dot);
+                }
+            });
+            return contain || this;
+        }
+
+        this.hide = () => {
+            // console.log(arr);
+            //arr.style.display="none";
+            this.call(arr, function (el) {
+                console.log(el);
                 el.style.display = "none";
             });
         }
@@ -161,7 +409,7 @@
                         setTimeout(function () {
                             s.borderWidth = "0";
                             setTimeout(function () {
-                                s.cssText = "";
+                                s.cssText = "overflow:hidden";
                                 s.display = "none";
                             }, 1)
                         }, 1)
@@ -199,7 +447,7 @@
                     if (h >= hg) {
                         window.clearInterval(effect);
                         setTimeout(function () {
-                            s.cssText = "";
+                            s.cssText = "overflow:hidden";
                             s.display = "block";
                         }, 1)
                     }
@@ -219,11 +467,14 @@
             return this;
         };
         this.fadetoggle = function (delay) {
-            if (window.getComputedStyle(el).opacity > 0) {
-                this.fadeout(delay);
-            } else {
-                this.fadein(delay);
-            };
+            this.call(arr,function (el) {
+                if (window.getComputedStyle(el).opacity > 0) {
+                    this.fadeout(delay);
+                } else {
+                    this.fadein(delay);
+                };
+            });
+
             return this;
         };
         return this;
