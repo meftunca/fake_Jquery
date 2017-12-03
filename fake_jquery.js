@@ -111,9 +111,8 @@
             let index;
             this.call(arr, function (el) {
                 let i = el.parentNode.children.length;
-
                 for (let w = 0; w < i; w++) {
-                    el.parentNode.children[0].setAttribute("tabindex", w);
+                    el.parentNode.children[0].setAttribute("tabindex", w-1);
                 }
                 index = el.getAttribute("tabindex");
             });
@@ -159,6 +158,20 @@
             });
             return this;
         }
+        this.after = (params)=>{
+            this.call(arr, function (el) {
+                let html = el.innerHTML;
+                el.innerHTML = html + " " + params;
+             });
+            return this;
+        }
+        this.before = (params) => {
+            this.call(arr, function (el) {
+                let html = el.innerHTML;
+                el.innerHTML = params + " " + html;
+            });
+            return this;
+        }
         this.appendto = (tag) => {
             let to = document.querySelector(tag);
             this.call(arr, function (el) {
@@ -177,6 +190,7 @@
             this.call(arr, function (el) {
                 let item = el.querySelectorAll(find_item);
                 this.call(item, function (finds) {
+                    console.log(finds);
                     return finds;
                 });
             });
@@ -308,19 +322,24 @@
             });
             return contain || this;
         }
-
+        this.animate = (keyframes=[],options= {})=>{
+            this.call(arr, function (el) {
+                 el.animate(keyframes,options);
+            });
+            return this;
+        }
         this.hide = () => {
-            // console.log(arr);
-            //arr.style.display="none";
             this.call(arr, function (el) {
                 console.log(el);
                 el.style.display = "none";
             });
+            return this;
         }
         this.show = () => {
             this.call(arr, function (el) {
                 el.style.display = "block";
             });
+            return this;
         }
         this.toggle = function (delay) {
             if (window.getComputedStyle(el) === "none" || el.style.display === "none") {
