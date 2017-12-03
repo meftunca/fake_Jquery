@@ -127,13 +127,14 @@
         }
         this.parent = function () {
             this.call(arr, function (el) {
-                el.parentNode;
+                arr = [el.parentNode];
             });
             return this;
         }
         this.closest = (par) => {
             this.call(arr, function (el) {
-                el.closest(par);
+                arr = [];
+                arr=[el.closest(par)];
             });
             return this;
 
@@ -189,9 +190,9 @@
         this.find = (find_item) => {
             this.call(arr, function (el) {
                 let item = el.querySelectorAll(find_item);
+                arr = [];
                 this.call(item, function (finds) {
-                    console.log(finds);
-                    return finds;
+                    arr.push(finds);
                 });
             });
             return this;
@@ -211,24 +212,28 @@
             return this;
         }
         this.width = (par = null) => {
+            let result;
             this.call(arr, function (el) {
                 if (par === null) {
-                    el.offsetWidth;
+                  result =   el.offsetWidth;
                 } else {
                     el.style.width = par;
+                    result = el.style.width;
                 }
             });
-            return this;
+            return result;
         }
         this.height = (par = null) => {
+            let result;
             this.call(arr, function (el) {
                 if (par === null) {
-                    el.offsetHeight;
+                    result = el.offsetHeight;
                 } else {
                     el.style.height = par;
+                    result = el.style.height;
                 }
             });
-            return this;
+            return result;
         }
         this.css = (par) => {
             this.call(arr, function (el) {
@@ -243,10 +248,17 @@
             });
             return result;
         }
-        this.offset = (par) => {
+        this.offsetLeft = (par) => {
             let result;
             this.call(arr, function (el) {
-                result = el.offset;
+                result = el.offsetLeft;
+            });
+            return result;
+        }
+        this.offsetTop = (par) => {
+            let result;
+            this.call(arr, function (el) {
+                result = el.offsetTop;
             });
             return result;
         }
@@ -275,7 +287,7 @@
                 let cl = el.classList;
                 for (dot of classes) {
                     if (cl.contains(dot)) {
-                        console.error("Vermek istediğiniz " + dot + " class'ı mevcut");
+                       return false;
                     } else {
                         el.classList.add(dot);
                     }
@@ -289,7 +301,7 @@
                 let cl = el.classList;
                 for (dot of classes) {
                     if (!cl.contains(dot)) {
-                        console.error("Silmek istediğiniz " + dot + " class'ı mevcut değil");
+                        return false;
                     } else {
                         el.classList.remove(dot);
                     }
@@ -330,7 +342,6 @@
         }
         this.hide = () => {
             this.call(arr, function (el) {
-                console.log(el);
                 el.style.display = "none";
             });
             return this;
