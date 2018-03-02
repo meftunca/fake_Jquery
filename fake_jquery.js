@@ -1,51 +1,47 @@
 {
+    var $ = {};
     var $ = (params) => {
         let selectType, arr;
         if (typeof params === "string") {
             params = params.split(",").map(String);
             selectType = "str";
             arr = [];
-        } else if (typeof params === "object") {
-            selectType = "object";
-            arr = params;
         } else {
             arr = [params];
             selectType = "object";
         }
         this.run = () => {
             if (selectType === "str") {
-                Array.prototype.forEach.call(params, (el) => {
+                Array.prototype.forEach.call(params, el => {
                     let element = document.querySelectorAll(el);
-                    Array.prototype.forEach.call(element, (el) => {
+                    Array.prototype.forEach.call(element, el => {
                         return arr.push(el);
                     })
                 });
+            } else {
+                return arr;
             }
             return this;
         };
         this.run();
         this.call = (el, callback) => {
-            if (selectType === "str") {
-                Array.prototype.forEach.call(el, callback);
-            } else {
-                Array.prototype.forEach.call(el, callback);
-            }
+            Array.prototype.forEach.call(el, callback);
             return this;
         };
         this.on = (event, callback, fn = false) => {
-            this.call(arr, (el) => {
-                el.addEventListener(event, callback, fn);
+            this.call(arr, el => {
+                return el.addEventListener(event, callback, fn);
             });
             return this;
         };
         this.off = (event, callback, fn = false) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 el.removeEventListener(event, callback, fn);
             });
             return this;
         };
         this.html = (text = null) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 if (text === null) {
                     return el.innerHTML;
                 } else {
@@ -55,7 +51,7 @@
             return this;
         };
         this.text = (text = null) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 if (text === null) {
                     return el.innerText;
                 } else {
@@ -64,31 +60,34 @@
             });
             return this;
         };
-        this.attr = (data, value) => {
-            this.call(arr, (el) => {
+        this.attr = (data, value, prefix = null) => {
+            prefix = prefix !== null ? prefix + "-" : "";
+            this.call(arr, el => {
                 if (data && value) {
-                    el.setAttribute(data, value);
+                    el.setAttribute(prefix + data, value);
                 } else {
-                    el.getAttribute(data);
+                    el.getAttribute(prefix + data);
                 }
             });
             return this;
         };
 
-        this.hasattr = (data) => {
-            this.call(arr, (el) => {
+        this.hasAttr = (data, prefix = null) => {
+            prefix = prefix !== null ? prefix + "-" : "";
+            this.call(arr, el => {
                 el.hasAttribute(data);
             });
             return this;
         };
-        this.removeattr = (data) => {
-            this.call(arr, (el) => {
-                el.removeAttribute(data);
+        this.removeAttr = (data, prefix = null) => {
+            prefix = prefix !== null ? prefix + "-" : "";
+            this.call(arr, el => {
+                el.removeAttribute(prefix + data);
             });
             return this;
         };
         this.data = (data, value) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 if (data && value) {
                     el.dataset[data.replace(/[A_Z]/g, '-$&').toLocaleLowerCase()] = value;
                 } else {
@@ -97,21 +96,21 @@
             });
             return this;
         };
-        this.hasdata = (data) => {
-            this.call(arr, (el) => {
+        this.hasData = (data) => {
+            this.call(arr, el => {
                 return el.dataset[data.replace(/[A_Z]/g, '-$&').toLocaleLowerCase()] !== undefined ? true : false;
             });
             return this;
         };
-        this.removedata = (data) => {
-            this.call(arr, (el) => {
+        this.removeData = (data) => {
+            this.call(arr, el => {
                 el.removeAttribute("data-" + data);
             });
             return this;
         };
         this.index = () => {
             let index;
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let i = el.parentNode.children.length;
                 for (let w = 0; w < i; w++) {
                     el.parentNode.children[0].setAttribute("tabindex", w - 1);
@@ -122,20 +121,19 @@
         };
         this.clone = () => {
             let clones;
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 clones = el.cloneNode(true);
             });
             return clones || this;
         };
         this.parent = () => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 arr = [el.parentNode];
             });
             return this;
         };
         this.closest = (par) => {
-            this.call(arr, (el) => {
-                arr = [];
+            this.call(arr, el => {
                 arr = [el.closest(par)];
             });
             return this;
@@ -143,15 +141,18 @@
         };
         this.siblings = (selector) => {
             let item = [];
-            item = arr.parentNode.querySelectorAll(selector);
-            arr = [];
-            this.call(item, function (wr) {
-                arr.push(wr);
+            this.call(arr, el => {
+                item = el.parentNode.querySelectorAll(selector);
+                arr = [];
+                this.call(item, function (wr) {
+                    arr.push(wr);
+                });
             });
+
             return this;
         };
         this.append = (tag, item) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let tager = document.createElement(tag);
                 tager.innerHTML = item;
                 el.append(tager);
@@ -159,35 +160,35 @@
             return this;
         };
         this.after = (params) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let html = el.innerHTML;
                 el.innerHTML = html + " " + params;
             });
             return this;
         };
         this.before = (params) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let html = el.innerHTML;
                 el.innerHTML = params + " " + html;
             });
             return this;
         };
-        this.appendto = (tag) => {
+        this.appendTo = (tag) => {
             let to = document.querySelector(tag);
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 to.append(el);
             });
             return this;
         };
-        this.prependto = (tag) => {
+        this.prependTo = (tag) => {
             let to = document.querySelector(tag);
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 to.prepend(el);
             });
             return this;
         };
         this.find = (find_item) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let item = el.querySelectorAll(find_item);
                 arr = [];
                 this.call(item, function (finds) {
@@ -197,7 +198,7 @@
             return this;
         };
         this.prepend = (tag, item) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let tager = document.createElement(tag);
                 tager.innerHTML = item;
                 el.prepend(tager);
@@ -205,104 +206,60 @@
             return this;
         };
         this.remove = (item) => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 el.remove();
             });
             return this;
         };
-        this.width = (par = null) => {
-            let result;
-            this.call(arr, (el) => {
-                if (par === null) {
-                    result = el.offsetWidth;
-                } else {
-                    el.style.width = par;
-                    result = el.style.width;
-                }
-            });
-            return result;
-        };
-        this.height = (par = null) => {
-            let result;
-            this.call(arr, (el) => {
-                if (par === null) {
-                    result = el.offsetHeight;
-                } else {
-                    el.style.height = par;
-                    result = el.style.height;
-                }
-            });
-            return result;
-        };
-        this.info = () => {
-            return this.call(arr, (el) => {
-                return window.getComputedStyle(el)
+        this.helper = () => {
+            this.call(arr, item => {
+                this.box = {
+                    left: (item.offsetLeft + window.screenLeft),
+                    top: (item.offsetTop + window.screenTop),
+                    right: (document.body.clientWidth - (item.offsetLeft + window.screenLeft)),
+                    bottom: (document.body.clientHeight - (item.offsetTop + window.screenTop)),
+                    height: item.clientHeight !== void 0 ? item.clientHeight : item.innerHeight,
+                    width: item.clientWidth !== void 0 ? item.clientWidth : item.innerWidth
+                };
             });
             return this;
-        }
-        this.css = (par) => {
-            this.call(arr, (el) => {
-                el.style.cssText = par;
-            });
-            return this;
-        };
-        this.style = (par) => {
-            let result;
-            this.call(arr, (el) => {
-                result = window.getComputedStyle(el)[par];
-            });
-            return result;
-        };
-        this.offsetLeft = (par) => {
-            let result;
-            this.call(arr, (el) => {
-                result = el.offsetLeft;
-            });
-            return result;
-        };
-        this.offsetTop = (par) => {
-            let result;
-            this.call(arr, (el) => {
-                result = el.offsetTop;
-            });
-            return result;
         };
         this.children = (par) => {
-            this.call(arr, (el) => {
-                el.children;
+            this.call(arr, el => {
+                return el.children;
             });
             return this;
         };
         this.prev = () => {
-            this.call(arr, (el) => {
-                el.previousSibling;
+            this.call(arr, el => {
+                return el.previousSibling;
             });
             return this;
         };
         this.next = () => {
             let sibling;
-            this.call(arr, (el) => {
-                el.nextElementSibling;
+            this.call(arr, el => {
+                return el.nextElementSibling;
             });
             return this;
         };
-        this.addclass = (className) => {
+        this.addClass = (className) => {
             let classes = className.split(" ").map(String);
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let cl = el.classList;
                 for (dot of classes) {
                     if (cl.contains(dot)) {
                         return false;
                     } else {
-                        el.classList.add(dot);
+                        return el.classList.add(dot);
                     }
                 }
             });
             return this;
         };
-        this.removeclass = (className) => {
+        this.removeClass = (className) => {
             let classes = className.split(" ").map(String);
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let cl = el.classList;
                 for (dot of classes) {
                     if (!cl.contains(dot)) {
@@ -314,9 +271,9 @@
             });
             return this;
         };
-        this.toggleclass = (className) => {
+        this.toggleClass = (className) => {
             let classes = className.split(" ").map(String);
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let cl = el.classList;
                 for (dot of classes) {
                     if (!cl.contains(dot)) {
@@ -328,148 +285,163 @@
             });
             return this;
         };
-        this.hasclass = (className) => {
+        this.setStyle = cssText => {
+            this.call(arr, el => {
+                el.style.cssText = cssText;
+            });
+        };
+
+        this.getStyle = (cssProp) => {
+            return this.call(arr, item => {
+                return item.style[cssProp];
+            });
+        };
+        this.hasClass = (className) => {
             let classes = className.split(" ").map(String),
                 contain;
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 let cl = el.classList;
                 for (dot of classes) {
                     contain = cl.contains(dot);
                 }
             });
             return contain || this;
-        }
-        this.animate = (keyframes = [], options = {}) => {
-            this.call(arr, (el) => {
-                el.animate(keyframes, options);
+        };
+        this.animate = (keyframes = [], options = {}, callback = null) => {
+            this.call(arr, el => {
+                let animation = el.animate(keyframes, options);
+                animation.onanimationend = () => {
+                    return callback
+                };
             });
             return this;
         };
         this.hide = () => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 el.style.display = "none";
             });
             return this;
         };
         this.show = () => {
-            this.call(arr, (el) => {
+            this.call(arr, el => {
                 el.style.display = "block";
             });
             return this;
         };
-        this.Toggle = (delay) => {
-            if (window.getComputedStyle(el) === "none" || el.style.display === "none") {
-                this.show(delay);
-            } else {
-                this.hide(delay);
-            }
-            return this;
-        };
-        this.fadeout = (duration) => {
-            this.call(arr, (el) => {
-                if (!duration) {
-                    duration = 400;
-                }
-                el.animate([
-                    {opacity: 1},
-                    {opacity: 0},
-                ], {
-                    duration: duration
-                });
-            });
-            return this;
-        };
-        this.fadeIn = (duration) => {
-            this.call(arr, (el) => {
-                if (!duration) {
-                    duration = 400;
-                }
-                el.animate([
-                    {opacity: 0},
-                    {opacity: 1},
-                ], {
-                    duration: duration
-                });
-            });
-            return this;
-        };
-        this.fadeToggle = (delay) => {
-            this.call(arr, (el) => {
-                if (window.getComputedStyle(el).opacity > 0) {
-                    this.fadeOut(delay);
+        this.toggle = (delay) => {
+            this.call(arr, el => {
+                if (window.getComputedStyle(el)["display"] === "none" || el.style.display === "none") {
+                    this.show(delay);
                 } else {
-                    this.fadeIn(delay);
+                    this.hide(delay);
+                }
+            });
+            return this;
+        };
+        this.fadeOut = (duration = 400, callback = null) => {
+            this.call(arr, el => {
+                el.style.display = "block";
+                let animation = el.animate([
+                    {opacity: 1},
+                    {opacity: 0},
+                ], {
+                    duration: duration
+                });
+                animation.addEventListener("finish", () => {
+                   el.style.display = "none";
+                    return callback
+                });
+            });
+            return this;
+        };
+        this.fadeIn = (duration = 400, callback = null) => {
+            this.call(arr, el => {
+                el.style.display = "block";
+                let animation = el.animate([
+                    {opacity: 0},
+                    {opacity: 1},
+                ], {
+                    duration: duration
+                });
+                animation.addEventListener("finish", () => {
+                    return callback
+                });
+            });
+            return this;
+        };
+        this.fadeToggle = (duration = 400, callback = null) => {
+            this.call(arr, el => {
+                if (window.getComputedStyle(el).opacity > 0 && window.getComputedStyle(el).display !== "none") {
+                    this.fadeOut(duration, callback = null);
+                } else {
+                    this.fadeIn(duration, callback = null);
                 }
             });
             return this;
         };
 
-        this.slideUp = (delay) => {
-            el.style.cssText = "display:block;overflow:hidden";
-            let padT = Number(window.getComputedStyle(el).paddingBottom.replace("px", "")),
-                padB = Number(window.getComputedStyle(el).paddingTop.replace("px", "")),
-                heightDefault = Number(window.getComputedStyle(el).height.replace("px", "")),
-                itemStyle = el.style;
-            this.call(arr, (el) => {
-                if (!delay) {
-                    delay = 400;
-                }
-                el.dataset.slide = "up";
-                el.animate([
-                    // keyframes
+        this.slideUp = (delay = 400, callback = null) => {
+            this.call(arr, el => {
+                let old_style = el.style.cssText;
+                el.style.cssText = "display:block;overflow:hidden";
+                let padT = Number(window.getComputedStyle(el).paddingBottom.replace("px", "")),
+                    padB = Number(window.getComputedStyle(el).paddingTop.replace("px", "")),
+                    heightDefault = Number(window.getComputedStyle(el).height.replace("px", ""));
+                el.dataset.slideEffect = "up";
+                let animation = el.animate([
                     {height: heightDefault + 'px', paddingTop: padT + 'px', paddingBottom: padB + 'px'},
                     {height: 0, paddingTop: 0, paddingBottom: 0}
                 ], {
-                    // timing options
                     duration: delay,
-                    easing: "cubic-bezier(0.42, 0, 0.58, 1)",
-                    fill: 'backwards'
-                    //iterations: Infinity
+                    easing: "cubic-bezier(0.12, 0, 0.58, 1)",
                 });
-                let timeout = setTimeout(() => {
-                    itemStyle.display = "none";
-                    window.clearTimeout(timeout);
-                }, delay);
+
+                animation.addEventListener("finish", () => {
+                    el.style.cssText = old_style;
+                    el.style.display = "none";
+                    return callback;
+                });
             });
             return this;
         };
-        this.slideDown = (delay) => {
-            el.style.cssText = "display:block;overflow:hidden";
-            let padT = Number(window.getComputedStyle(el).paddingBottom.replace("px", "")),
-                padB = Number(window.getComputedStyle(el).paddingTop.replace("px", "")),
-                heightDefault = Number(window.getComputedStyle(el).height.replace("px", "")),
-                itemStyle = el.style;
-            this.call(arr, (el) => {
-                if (!delay) {
-                    delay = 400;
-                }
-                this.effect = false;
-                el.dataset.slide = "down";
-                el.animate([
-                    // keyframes
+        this.slideDown = (delay = 400, callback = null) => {
+            this.call(arr, el => {
+                let old_style = el.style.cssText;
+                el.style.cssText = "display:block;overflow:hidden";
+                let padT = Number(window.getComputedStyle(el).paddingBottom.replace("px", "")),
+                    padB = Number(window.getComputedStyle(el).paddingTop.replace("px", "")),
+                    heightDefault = Number(window.getComputedStyle(el).height.replace("px", ""));
+                el.dataset.slideEffect = "down";
+                let animation = el.animate([
                     {height: 0, paddingTop: 0, paddingBottom: 0},
                     {height: heightDefault + 'px', paddingTop: padT + 'px', paddingBottom: padB + 'px'},], {
-                    // timing options
                     duration: delay,
-                    easing: "cubic-bezier(0.42, 0, 0.58, 1)",
-                    fill: 'forwards'
-                    //iterations: Infinity
+                    easing: "cubic-bezier(0.12, 0, 0.58, 1)",
+                });
+
+                animation.addEventListener("finish", () => {
+                    el.style.cssText = old_style;
+                    el.style.display = "block";
+                    el.style.overflow = "hidden";
+                    return callback;
                 });
             });
             return this;
         };
-        this.slideToggle = (delay) => {
-
-            this.call(arr, (el) => {
-                if (el.dataset.slide === "up" || el.hasAttribute("data-slide") === false) {
-                    this.slideDown(delay);
-                } else if (el.dataset.slide === "down") {
-                    this.slideUp(delay);
+        this.slideToggle = (delay = 400, callback = null) => {
+            this.call(arr, el => {
+                if (el.dataset.slideEffect === "up" || window.getComputedStyle(el)["display"] === "none") {
+                    this.slideDown(delay, callback = null);
+                } else if (el.dataset.slideEffect === "down" || window.getComputedStyle(el)["display"] !== "none") {
+                    this.slideUp(delay, callback = null);
                 }
             });
             return this;
         };
-
+        // extends function
+        this.creator = (funcName, func) => {
+            return $[funcName] = func;
+        };
         return this;
-    }
+    };
 }
